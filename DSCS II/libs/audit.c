@@ -24,6 +24,7 @@ void* mem_set(void* b, int c, size_t len) {
 }
 
 
+
 bool isvalueinarray(int val, int *arr, int size){
     int i;
     for (i=0; i < size; i++) {
@@ -64,9 +65,9 @@ struct query* challenge(int num_query, unsigned long long m, struct public_key* 
 } 
 
 
+
 struct T* prove(struct file* f, struct query* q , int num_query, struct public_key* pubkey)
 {
-
   struct file_vector* fv;
   struct file_block* fb;
 
@@ -124,7 +125,6 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
         }
       }
    } 
-
 
  /**
     Step 2: Compute tag list and tag to be sent           
@@ -195,7 +195,6 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
     Step 4: Compute y           
  **/
 
-
    struct vector_v* y = (struct vector_v*)malloc(sizeof(struct vector_v));
    y->blk = (struct block*)malloc(sizeof(struct block)* n);
  
@@ -211,9 +210,6 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
 
       element_set(y_b->data, blk_b->data);
    }
-
-  
-
 
   struct T* response = (struct T*)malloc(sizeof(struct T));
 
@@ -280,10 +276,6 @@ int verify(struct query* q, struct T* t, struct public_key* pubkey , int num_que
        }
     }
   }
-
-
-
- 
 
 /**
    Check 3: check equality
