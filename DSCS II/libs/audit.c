@@ -141,9 +141,6 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
    element_t w_tag;
    element_init_Zr(w_tag, pubkey->pairing);
 
-   //struct tag_list* t_list = (struct tag_list*)malloc(sizeof(struct tag_list));
-  // t_list->t = (struct tag_t*)malloc(sizeof(struct tag_t)*num_query);
-
    element_set1(mul);
 
    for(int i = 0; i <num_query;i++)
@@ -151,14 +148,6 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
      index = q[i].i;
      fv = f->vecs+index;
      t = fv->tag;
-    // tag = t_list->t+i;
-
-    // tag->pairing = t->pairing;
-
-    // element_init_same_as(tag->sigma, t->sigma);
-    // element_set(tag->sigma, t->sigma);
-
-    // tag->index   = t->index;
 
      element_pow_zn(b1, t->sigma , q[i].nu);
      element_mul(mul , mul , b1);
@@ -183,7 +172,7 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
     element_init_Zr(sum, pubkey->pairing);
     element_init_Zr(a, pubkey->pairing);
 
-//printf("the value for ws are as follows\n\n");
+
     for(int i = 0;i < n+m ;i++)
     {
       blk_b = w->blk+i;
@@ -225,38 +214,6 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
 
   
 
-  /**
-    Step 5: Compute skiplist proof           
- 
-
-  clock_t start, end;
-  double skiplist_proofgen_time;
-
-  struct proof_list* pi = (struct proof_list*)malloc(sizeof(struct proof_list));
-   pi->pl = (struct proof_vector*)malloc(sizeof(struct proof_vector)* num_query);
-
-  // printf("The size is : %ld, %ld\n", sizeof(struct proof), sizeof(proof_list));
-
-   struct proof_vector* p_v;
-   //struct proof* pf;
-
-   start = clock();
-
-   for(int i = 0;i< num_query; i++)
-   {
-     p_v = S.gen_proof(q[i].i+1,m);
-     pi[i].pl = p_v;
-    // pf = p_v->pv+i;
-  // printf("here in audit\n");
-  // printf("%s\n", pf->label);
- 
-   }
-
-   end = clock();
-   skiplist_proofgen_time = ((double) (end - start) ) / CLOCKS_PER_SEC;
-   printf("Time taken for proofgen of skiplist for %d queried vectors is %f\n", num_query,skiplist_proofgen_time);
-
-**/
 
   struct T* response = (struct T*)malloc(sizeof(struct T));
 
@@ -264,19 +221,6 @@ struct T* prove(struct file* f, struct query* q , int num_query, struct public_k
   element_set(response->t , w_tag);
 
   response->y = y;
-
-  //struct T1* t1 = (struct T1*)malloc(sizeof(struct T1));
-  //t1->y = y;
-  
-
-  
- // struct T2* t2 = (struct T2*)malloc(sizeof(struct T2)); 
-  //t2->ti = t_list;
- // t2->pi = pi;
-
-  //response->t1 = t1;
-  //response->t2 = t2;
-
   return response;
 
 }
@@ -291,10 +235,7 @@ int verify(struct query* q, struct T* t, struct public_key* pubkey , int num_que
   int output = 0 ;
 
   unsigned long long m = pubkey->m;
-  unsigned long long n = pubkey->n;
-
- // struct T1* t1 = t->t1;
- // struct T2* t2 = t->t2;  
+  unsigned long long n = pubkey->n;  
 
   element_t tag ;
   element_init_same_as(tag, t->t);
@@ -306,14 +247,11 @@ int verify(struct query* q, struct T* t, struct public_key* pubkey , int num_que
 
   struct vector_v* w = (struct vector_v*)malloc(sizeof(struct vector_v));  
   w->blk = (struct block*)malloc(sizeof(struct block)*(n + m));
-
- // printf("creating a vector w here ..\n");
   
   struct block* b; 
   int f ;
   for(int i = 0; i< n+m; i++)
   {
-   //  printf("%d\n",i);
      b = w->blk+i;
      
      element_init_Zr(b->data , pubkey->pairing);
@@ -346,32 +284,7 @@ int verify(struct query* q, struct T* t, struct public_key* pubkey , int num_que
 
 
  
-/**
-   Check 2: check tag
 
-
-
-   struct tag_list* ti = t2->ti;
-   struct tag_t* tc;
-   int index;
-   element_t a;
-   element_t mul;
-
-
-   element_init_Zr(mul, pubkey->pairing);
-   element_init_Zr(a, pubkey->pairing);
-   element_set1(mul);
-
-   for(int i = 0; i<num_query ; i++)
-   {
-     tc = ti->t+i;
-     element_pow_zn(a, tc->sigma , q[i].nu);
-     element_mul(mul , mul , a);
-   }
-
-   int flag2 ;
-   flag2 = element_cmp(mul,tag);
-**/
 /**
    Check 3: check equality
 **/
@@ -401,11 +314,6 @@ int verify(struct query* q, struct T* t, struct public_key* pubkey , int num_que
 
   element_set1(prod1);
   element_set1(prod2);
-
-  //clock_t s1, e1;
-  //long double eq_time;
-
- //s1 = clock();
 
   for(unsigned long long i = 0 ; i < n+m ;i++)
   {
@@ -437,45 +345,8 @@ int verify(struct query* q, struct T* t, struct public_key* pubkey , int num_que
   }
  
   element_mul(prod, prod1, prod2);
-
   element_pairing(temp2, prod, pubkey->z);
-
   flag3 = element_cmp(temp1, temp2);
-
- //e1 = clock();
-//eq_time =  ((long double) (e1 - s1) ) / CLOCKS_PER_SEC;
- //printf("Time taken for eq verification is %Lf sec\n",eq_time);
-
-printf("flag3 is %d\n", flag3);
-
-
- /**
-   Check 1: check for all the proofs
-
-
-  int flag1 = 1;
-  
-  struct proof_list* plist = t2->pi;
-  struct proof_vector* p_v;
-  struct proof* pf;
-
-  for(int i = 0;i<num_query;i++)
-  {
-    
-    p_v = plist[i].pl;
-    if(ListVerifyRead(q[i].i+1, root, p_v, m) == 1 ) 
-    {
-      continue;
-    }
-    else
-    {
-      flag1 = 0;
-      continue;
-    }   
-  }
-
-printf("flag 1 : %d\n", flag1);
-**/
 
   output = (!flag3);
 
